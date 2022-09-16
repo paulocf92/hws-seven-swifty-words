@@ -24,6 +24,7 @@ class ViewController: UIViewController {
         }
     }
     
+    var hiddenButtons = 0
     var level = 1
     
     override func loadView() {
@@ -75,6 +76,8 @@ class ViewController: UIViewController {
         
         let buttonsView = UIView()
         buttonsView.translatesAutoresizingMaskIntoConstraints = false
+        buttonsView.layer.borderWidth = 1
+        buttonsView.layer.borderColor = UIColor.lightGray.cgColor
         view.addSubview(buttonsView)
         
         NSLayoutConstraint.activate([
@@ -146,6 +149,7 @@ class ViewController: UIViewController {
         guard let answerText = currentAnswer.text else { return }
         
         if let solutionPosition = solutions.firstIndex(of: answerText) {
+            hiddenButtons += activatedButtons.count
             activatedButtons.removeAll()
             
             var splitAnswers = answersLabel.text?.components(separatedBy: "\n")
@@ -155,16 +159,23 @@ class ViewController: UIViewController {
             currentAnswer.text = ""
             score += 1
             
-            if score % 7 == 0 {
+            if hiddenButtons == 20 {
                 let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
                 present(ac, animated: true)
             }
+        } else {
+            score -= 1
+            
+            let ac = UIAlertController(title: "Uh-oh", message: "That's an incorrect guess, try again!", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
         }
     }
     
     func levelUp(action: UIAlertAction) {
         level += 1
+        hiddenButtons = 0
         
         solutions.removeAll(keepingCapacity: true)
         loadLevel()
