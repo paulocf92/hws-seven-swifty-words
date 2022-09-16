@@ -142,7 +142,13 @@ class ViewController: UIViewController {
     }
     
     @objc func clearTapped(_ sender: UIButton) {
+        currentAnswer.text = ""
         
+        for button in activatedButtons {
+            button.isHidden = false
+        }
+        
+        activatedButtons.removeAll()
     }
     
     func loadLevel() {
