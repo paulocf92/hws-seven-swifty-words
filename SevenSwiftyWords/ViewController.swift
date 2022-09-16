@@ -65,7 +65,7 @@ class ViewController: UIViewController {
         let clear = UIButton(type: .system)
         clear.translatesAutoresizingMaskIntoConstraints = false
         clear.setTitle("CLEAR", for: .normal)
-        submit.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        clear.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
         view.addSubview(clear)
         
         let buttonsView = UIView()
@@ -138,7 +138,35 @@ class ViewController: UIViewController {
     }
     
     @objc func submitTapped(_ sender: UIButton) {
+        guard let answerText = currentAnswer.text else { return }
         
+        if let solutionPosition = solutions.firstIndex(of: answerText) {
+            activatedButtons.removeAll()
+            
+            var splitAnswers = answersLabel.text?.components(separatedBy: "\n")
+            splitAnswers?[solutionPosition] = answerText
+            answersLabel.text = splitAnswers?.joined(separator: "\n")
+            
+            currentAnswer.text = ""
+            score += 1
+            
+            if score % 7 == 0 {
+                let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
+                present(ac, animated: true)
+            }
+        }
+    }
+    
+    func levelUp(action: UIAlertAction) {
+        level += 1
+        
+        solutions.removeAll(keepingCapacity: true)
+        loadLevel()
+        
+        for button in letterButtons {
+            button.isHidden = false
+        }
     }
     
     @objc func clearTapped(_ sender: UIButton) {
